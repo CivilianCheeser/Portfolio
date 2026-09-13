@@ -1,5 +1,5 @@
 README
-Written by: Jerry Qiao (jqiao04)
+Written by: Jerry Qiao
 Gerp project
 Date started: Jul 26 2026
 
@@ -10,10 +10,7 @@ Purpose:
     and insensitve word query options are availble in Gerp.
 
 Acknowledgement:
-    Thanks to Mavis Murdock for taking the time to review my design checkoff.
-    Thanks to Max for hosting the lecture on cs15 content.
-    Thanks to geeks for geeks for providing inspiration on my word parsing
-        algoritm.
+    Thanks to Mavis and Max for providing insight and suggestions.
 
 How to compile and run:
     Compile command:  make
@@ -211,7 +208,3 @@ Testing:
     measured by gerp_perf, it still times out when running certain 
     long tests in unit_tests.h, which is a bummer.
 
-
-
-Part 1: Time Spent: 5hrs
-Part 2: Time Spent: 20hrs
