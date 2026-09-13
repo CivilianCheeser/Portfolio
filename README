@@ -1,0 +1,217 @@
+README
+Written by: Jerry Qiao (jqiao04)
+Gerp project
+Date started: Jul 26 2026
+
+Purpose: 
+    Gerp allows the user to find words in a directory. If a word is 
+    found in a directory, Gerp will write out the location of that
+    word in an file that the user provides. Both case sensitive
+    and insensitve word query options are availble in Gerp.
+
+Acknowledgement:
+    Thanks to Mavis Murdock for taking the time to review my design checkoff.
+    Thanks to Max for hosting the lecture on cs15 content.
+    Thanks to geeks for geeks for providing inspiration on my word parsing
+        algoritm.
+
+How to compile and run:
+    Compile command:  make
+    Run command:      ./gerp inputDirectory outputFile
+
+List of files:
+    main.cpp: 
+        Driver program for gerp. Checks to make sure the user has
+        enter the right run command before starting gerp.
+    
+    Gerp.h: 
+        Gerp class is the main functionality of gerp. Gerp will index 
+        the content of the user-provided directory and will prepare to 
+        handle queries about the location of words in that directory.
+        Gerp class also allows user to change the file where gerp produces
+        its output.
+    
+    Gerp.cpp:
+        Implementation file for Gerp class.
+    
+    Table.h:
+        Table is a class designed to mimic the functions of cpp 
+        <unorderd_map> that I wrote for gerp. Table does not support
+        deleting elements. This file also contains the implementation
+        function for Table class.
+    
+    processing.h:
+        the directory traversing functions in gerp is a modified version
+        of the traverseDirectory() function in this file. Gerp.cpp also 
+        uses the stripNonAlphaNum() functions in its implementation.
+
+    processing.cpp: 
+        implementation file for processing.h
+
+    unit_tests.h:
+        Used to unit test overall functionality and edge cases of 
+        processing.h functions, Table class, and gerp.
+    
+    try.cpp:
+        design for more in-depth and customizable testing of certain
+        unit_test functions.
+
+    Makefile:
+        streamlines the compilation of code
+
+    README: 
+        This file.
+
+
+Architectural Overview:
+    main.cpp:
+        driver program for gerp. After verifying run command, calls Gerp.
+    
+    Gerp:
+        main functionality of gerp. Indexes and traverses through the 
+        directory using FSTree and DirNode classes. The data from
+        the directory is then stored using Table. Also calls processing.h
+        functions to clean up strings.
+    
+    FSTree:
+        FSTree, when given a directory name, will represent the directory
+        as a tree of DirNodes
+
+    DirNode:
+        A node in FSTree that represents a single directory. Gerp uses
+        DirNode to traverse through the files and subdirectories in a
+        DirNode
+
+    Table:
+        A data structure designed to mimic cpp's <unordered_map>. When
+        used by Gerp, Table takes a word as its key and returns the 
+        mapped value, which contains information on where this word
+        can be found. Table maintains a no duplicate invariant for
+        all mapped values of a certain key. This is done through
+        cpp <set>, though I would really have liked to use
+        cpp <unordered_set> instead for the faster access and insertion
+
+    processing.h:
+        This file contains a helpful function: stripNonAlphaNum(). Gerp
+        use this function to clean up the queried word and the words in
+        the user-provided directory.
+    
+Data Structure used:
+    I used list to represent all the files and the lines inside that file.
+    My reasons are the following: random access is not important; I would
+    only insert through pushback; there is no need for deletion; list uses
+    less space than vector. Due to all of these reasons, I think list is
+    the simplest and most space efficient data structure to contain 
+    information about the files and the lines.
+
+    I used two massive Tables to store all the words encountered in a
+    directory. A hash-table like data structure makes the most sense 
+    for a project like gerp, where you query a word (the key) and
+    the code is supposed to return the location where that word is 
+    found (the map). Since the unordered series of cpp data structure is
+    banned, I built my own. Table is designed to mimic an unordered map.
+    Table does not support deletion since Gerp doesn't need it. It uses
+    linear probing because I had some trouble with quadratic probing not
+    going through all the data slots before it timed out. 
+
+    The actual data of Table is stored in a vector for its flexible
+    resizing and random access properties.
+
+    Table maintains a no duplicate invariant for
+    all mapped values of a certain key. This is done through
+    cpp <set>, though I would really have liked to use
+    cpp <unordered_set> instead for the faster access and insertion.
+    I considered building an unordered set of my own, but I felt like
+    it was too much of a hassle. Plus, my program already passed the
+    baseline requirements, although it is a bit slow for my liking.
+
+Algorithm:
+    The overall flow of the gerp is that main() runs, main() calls
+    gerp, and gerp handles the rest.
+
+    In gerp, the alorithm can be split into 2 major parts: indexing
+    the data and handing query.
+
+    To index the data, gerp first runs through all the files to record
+    the file names. Then, it runs through all the files again to record
+    the lines. Uh, now that I think about it, these two functions can
+    probably be done in 1 pass through. I made this design choice originally
+    because I was worried about vectors deleting pointers when it resized.
+    But since i've moved to a list structure, this can probably be simplified.
+    Anyways, afterwards, gerp runs through all the recorded lines and stores 
+    the words in two big Tables. One table stores all the case sensitive words
+    and their location. The other does the same for the case insensitive ones.
+
+    For query handling, most of them are simple except for search().
+    Search is complicated because I had to built a whole data container
+    for this. Search calls the find() function within the tables
+    using a user provided string as the key, it then sends the results
+    off to writeFile() to be written to the user-provided outfile.
+
+    I think I will also talk a bit about Table's algorithm, since that
+    is also a big part of the project.
+
+    Table works as a hash table with its key and map stored in the array. 
+    Its main functionalities are insert() and find(). 
+
+    With insert, it first check if the load factor is appropriate.
+    If not, it makes reserves more size in the data vector and re-copies
+    everything in. Afterwards, insert hashes the key, makes sure there
+    is no collision, and puts the key and its map in that slot in the
+    data vector.
+
+    For find(), it hashes the key and see if it can find the key stored
+    in data vector. It will go through every element in data before it
+    gives up. After finding the right map, it returns a set of 
+    whatever is stored there. If it can't find it, it returns an empty set.
+    I am using a set to ensure there is no duplicates in the mapped value.
+
+Testing:
+    Learning from my horrific testing in typewriter, I tried my best
+    to adhere to the "write a little, test a little". After writing each
+    class or a major function, I test it. All the testing can be found
+    in unit_tests.h.
+
+    In chronological order:
+
+    processing.h:
+        the functions were relatively simple. I wrote and tested one
+        function first before doing the same for the second function.
+
+    Table.h:
+        Wrote and test in this order: constructor -> insert -> find.
+        Then, I moved to test if Table worked on edge case testing.
+        E.g. I tested if Table can store structs (no), but it can
+        store pointers to structs. To be honest, I think i can
+        get Table to work with structs, but it was not necessary
+        for its brainpower needed to do this.
+
+    main.cpp:
+        This my starting point to write the gerp program.
+        My writing main to initially only handle
+        a simple user argc check, I can then work on my 
+        unit testing formula for future gerp tests.
+
+    Gerp.h:
+        I tried writing the bare minimum in Gerp so that I
+        can start including input files to my gerp unit testing.
+        So, the quit function was done first. Then, I moved on 
+        to the file change function and the search function.
+
+    After submitting my first draft to gradescope, I got a few errors
+    that, as of Aug 6 17:49, I did not figure out. So I needed to do
+    more trouble shooting. One thing that bugged me was that I cannot
+    test big directories and long tests because they keep timing out.
+    For some tests, I verifying by manually running it in my terminal,
+    but this is clearly suboptimal.
+
+    I then decided that I needed to make my code faster. After making
+    some changes, I ran my old unit test to verify i did not break anything.
+    Although my program now takes half the time as my initial version when 
+    measured by gerp_perf, it still times out when running certain 
+    long tests in unit_tests.h, which is a bummer.
+
+
+
+Part 1: Time Spent: 5hrs
+Part 2: Time Spent: 20hrs

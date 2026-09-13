@@ -1,0 +1,209 @@
+Names: Jerry Qiao
+utlns: jqiao04
+
+Answer the questions below, and submit your answers under the assignment
+"gerp Design Checkoff" on Gradescope. You must sign up for a design checkoff
+slot with a TA to discuss your provided answers (see spec for sign up link).
+Make sure to submit this file *prior* to your design checkoff.
+
+For each question, give as much detail as you feel is necessary.
+
+1. What classes and structs will you implement for your program? 
+   For each class, provide a list of public functions of that class; 
+   for each struct, provide a list of member variables.
+
+Answer:
+   File struct: (stores information about a file)
+   File struct will contain: file name, file path, a vector of lines of words,
+   and a WordTable.
+
+   WordTable class: (easy word searching)
+   Insert/Build(string word)
+   search(string word) -> returns a list of all line number where this 
+   word is found
+   
+   caseInsensitiveSearch(string word) -> returns a list of all line number 
+   where this word is found in its case insensitive form.
+
+   Word Struct:
+   string word, string caseInsensitiveWord, list <int> lineNum
+
+
+        
+2. Describe the index that you will build for querying. What specific data
+   structures will you use to build this index? *Important*: Bring an
+   accompanying drawing of your index structure when you come to your checkoff.
+
+Answer:
+   Lets go from a big to small view.
+   
+   To manage the files:
+   I will use a list of File struct. When searching, my gerp will go through
+   each of this files to look inside it.
+
+   While inside the file:
+   The file will contain a WordTable. This will facilitate the search. I
+   want to use an STL template data container so i dont need to do
+   too much troubleshooting. I think I will build my own hash table functions
+   using a vector and a built in hash function. I will try to keep the load
+   factor managable using vector resize
+
+   WordTable will contain WordStruct. When the code finds the string,
+   it will retrieve the lineNum list. The information here will be used
+   to print and output to the terminal and to the file where the word is 
+   found and its corresponding line (retrieved by accessing the vector 
+   of words in File struct.)
+
+
+
+3. To use your index, you will use something for lookup (the key) and you will
+   get some associated data back (the value). What are the C++ *types* of your
+   index's key and value? Examples of valid types: int, string,
+   vector<string>, vector<list<string>>; you may also define custom types using
+   structs/classes, e.g., Animal and vector<Animal> are valid types if you
+   define a struct/class named Animal. If your key/value types involve custom
+   classes/structs, they should be included in your answer to question #1.
+                
+Answer:
+
+   Key type: string
+   Value type: list <int> lineNum        
+
+4. Explain what a collision is versus having multiple lines associated with 
+   a particular word. Write (and/or draw) out an example of when a 
+   collision occurs. Write (and/or draw) out an example of when multiple 
+   lines associated with a single word. 
+
+Answer:
+   Collision is when two different words want to be mapped to the same
+   index in an array. For example, in my WordTable, "mug" and "pen" 
+   produces the same index when hashed.
+   
+   Multiple lines with a same word is like seeing "int" in main.cpp twice.
+   For example, we may find a "int" in "int main()" and another at 
+   "int a = 0"
+
+5. What do you expect the *space* complexity of your index will be? How many
+   times will a single line be stored according to your data structures?
+
+Answer:
+   I reckon the space complexity is O(n) -> n = number of lines
+   A single line will be 3 three times. One in vector, 
+   one in WordTable, and one in case insentive form
+
+   Now that I write this, it is starting to concern me.
+   If needed, I will remove the vector of lines. Instead,
+   each time the query is asked, the program will visit the file
+   again and go through it as if it has not seen it before.
+
+
+6. What is the time complexity of *building* your index? If you refer to some
+   variable, be sure to specify what the variable refers to, e.g., in "O(n)",
+   state explicitly what "n" is.
+
+Answer:
+   The time complexity is O(n) -> n = number of lines
+                
+7. What is the time complexity of *using* your index for lookup? As above,
+   be specific about variables you use.
+
+Answer:
+   To be specific, it is O(n) -> n = number of times this word appears in
+   the directory.
+
+   To be general. I think it should be constant if I get to use a hash 
+   table logic.
+   
+   It is about constant to search for a word in a hash table. This gets
+   me the line numbers. then, it takes a constant time to access the line
+   through a vector.
+
+8. How will you handle case-sensitive search?
+   What is the time complexity (should be close to O(1))?
+
+Answer:
+   each word will also store itself in an unaltered form
+
+9. How will you handle case-insensitive search?
+   What is the time complexity (should be close to O(1))?
+
+Answer:
+   each word will also store itself in an all caps form
+
+10. How are you handling duplicate words within a line? Consider these two example 
+   lines: 
+
+      (i) the cat and the dog 
+      (ii) the cat and THE dog 
+
+   If a user does a case sensitive query on line (i) it should report 'the' 
+   only once by showing the line only once in the output. 
+   How will you do this? 
+
+
+
+   If a user does a case insensitive query on line (ii) it should report 'the'
+   only once by showing the line only once in the output. How will you do 
+   this? 
+
+Answer:
+   For both (i) and (ii)
+   If i search for a word and I see it wants me to print the same line number
+   twice, then I will not print it the second time. This can be done through 
+   sorting the line numbers.
+
+   LOOK INTO SETS FOR SINCE IT DOES NOT ALLOW DUPLICATES
+
+
+
+11. How will you test your implementation and what specific evidence of testing
+    will you submit?
+
+Answer:
+   I will use unit test to test edge cases and torture test it on big files.
+   I will use " < input.in > out.cout" and diff to compare the results of
+   cout and outputfile.
+
+12. What is your schedule for completing this assignment? Include specific dates
+    and the tasks that you would like to accomplish by each date. Do not forget
+    testing!
+
+Answer: 
+   Well I have to finish part 1 by tomorrow.
+   This I think I will plan later.
+
+
+
+
+/* PERFORMANCE STATS!
+
+Last updated: Aug 5 1532
+
+-TinyData
+==== Results ====
+Your runtime (hh:mm:ss):        0:00:00
+Reference runtime (hh:mm:ss):   0:00:00
+Your peak RAM usage (GB):       0
+Reference peak RAM usage (GB):  0
+
+-Small Gutenberg
+==== Results ====
+Your runtime (hh:mm:ss):        0:00:03
+Reference runtime (hh:mm:ss):   0:00:01
+Your peak RAM usage (GB):       0.2518
+Reference peak RAM usage (GB):  0.1785
+
+-medium Gutenberg
+==== Results ====
+Your runtime (hh:mm:ss):        0:00:14
+Reference runtime (hh:mm:ss):   0:00:02
+Your peak RAM usage (GB):       0.8605
+Reference peak RAM usage (GB):  0.6171
+
+- large Gutenberg
+==== Results ====
+Your runtime (hh:mm:ss):        0:01:31
+Reference runtime (hh:mm:ss):   0:00:10
+Your peak RAM usage (GB):       3.7172
+Reference peak RAM usage (GB):  4.225
+*/
